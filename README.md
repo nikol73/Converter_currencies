@@ -1,1 +1,1 @@
-# Converter_currencies
+# Converter of currencies
