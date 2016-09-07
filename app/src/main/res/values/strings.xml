@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Converter_currencies</string>
+    <string name="menuItem1">Таблица валют</string>
+    <string-array name="currency">
+        <item>Валюта</item>
+        <item>Доллар</item>
+        <item>Евро</item>
+    </string-array>
+</resources>
