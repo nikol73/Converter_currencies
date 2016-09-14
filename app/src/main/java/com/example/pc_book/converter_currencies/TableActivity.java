@@ -16,23 +16,21 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class TableActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
+public class TableActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_table);
-        setTitle("Таблица валют в месяц");
+        setTitle(getString(R.string.NameTitle_TableActivity));
         eventButton();
         yearSpinner();
     }
 
-    int fromYear = 2001, beforeYear = 2016;
-    Spinner yearSpinner;
-
-    Button buttonTable;
-
-    private Loader<String> mLoader;
+    private final int fromYear = 2001, beforeYear = 2016;
+    private Spinner yearSpinner;
+    private Button buttonTable;
+    private Loader<ArrayList> mLoader;
 
     public void yearSpinner() {
         int year = beforeYear - fromYear;
@@ -65,11 +63,11 @@ public class TableActivity extends AppCompatActivity implements LoaderManager.Lo
                     LinearLayout l = (LinearLayout) findViewById(R.id.listTable);
                     l.removeAllViews();
 
-                    buttonTable.setText("ЗАГРУЗКА...");
+                    buttonTable.setText(getString(R.string.textButtonTable_loading));
                     resetLoader("table " + spinnerYear);
                     mLoader.onContentChanged();
                 } else {
-                    Message("Не выбран год");
+                    Message(getString(R.string.Message_NoYear));
                 }
 
             }
@@ -103,25 +101,31 @@ public class TableActivity extends AppCompatActivity implements LoaderManager.Lo
 
 
     @Override
-    public void onLoadFinished(Loader<String> loader, String data) {
+    public void onLoadFinished(Loader<ArrayList> loader, ArrayList data) {
         if (!data.equals("")) {
             createTable(data);
         }
-        buttonTable.setText("ОБНОВИТЬ");
+        buttonTable.setText(getString(R.string.textButtonTable_noloading));
     }
 
-    public void createTable(String data) {
+    public void createTable(ArrayList data) {
 
-        String EURUSD[] = data.split(";");
-        String EUR[] = EURUSD[0].split(" ");
-        String USD[] = EURUSD[1].split(" ");
+        ArrayList EUR = new ArrayList();
+        ArrayList USD = new ArrayList();
 
-        String Month[] = {"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-                "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
+        String Month[] = getResources().getStringArray(R.array.month);
+
+        for (int i = 0; i < data.size(); i++) {
+            if (i % 2 == 0) {//EUR
+                EUR.add(data.get(i));
+            } else if (i % 2 == 1) { //USD
+                USD.add(data.get(i));
+            }
+        }
 
 
-        for (int i = 0; i < EUR.length; i++) {
-            addView(Month[i], String.format("%.2f", Double.parseDouble(EUR[i])), String.format("%.2f", Double.parseDouble(USD[i])));
+        for (int i = 0; i < EUR.size(); i++) {
+            addView(Month[i], String.format("%.2f", Double.parseDouble(EUR.get(i).toString())), String.format("%.2f", Double.parseDouble(USD.get(i).toString())));
         }
     }
 
@@ -133,14 +137,14 @@ public class TableActivity extends AppCompatActivity implements LoaderManager.Lo
 
 
     @Override
-    public Loader<String> onCreateLoader(int id, Bundle args) {
-        Loader<String> mLoader = null;
+    public Loader<ArrayList> onCreateLoader(int id, Bundle args) {
+        Loader<ArrayList> mLoader = null;
         mLoader = new ConverterLoader(this, args);
         return mLoader;
     }
 
     @Override
-    public void onLoaderReset(Loader<String> loader) {
+    public void onLoaderReset(Loader<ArrayList> loader) {
     }
 
     public void Message(String message) {

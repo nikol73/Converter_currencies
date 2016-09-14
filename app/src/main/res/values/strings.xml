@@ -1,9 +1,44 @@
 <resources>
     <string name="app_name">Converter_currencies</string>
     <string name="menuItem1">Таблица валют</string>
+
+    <string name="NameTitle_ActivityMain">Конвертер валют</string>
+    <string name="NameTitle_TableActivity">Таблица валют в месяц</string>
+
+    <string name="Message_NotDownloadedXml">Не удалось скачать данные</string>
+    <string name="Message_ErrorInParameters">Данные за текущий день отсутствуют</string>
+    <string name="Message_DollarEuro">Указанные валюты одинаковые!</string>
+    <string name="Message_fields">Не все поля заполненны!</string>
+    <string name="Message_NoYear">Не выбран год</string>
+
+    <string name="textButtonConvert_loading">ЗАГРУЗКА...</string>
+    <string name="textButtonConvert_noLoading">КОНВЕРТИРОВАТЬ</string>
+    <string name="textButtonTable_loading">ЗАГРУЗКА...</string>
+    <string name="textButtonTable_noloading">ОБНОВИТЬ</string>
+
+    <string name="textTextView_nameCurrency_DE">Доллар -> Евро</string>
+    <string name="textTextView_nameCurrency_ED">Евро -> Доллар</string>
+
     <string-array name="currency">
         <item>Валюта</item>
         <item>Доллар</item>
         <item>Евро</item>
     </string-array>
+
+    <string-array name="month">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Октябрь</item>
+        <item>Ноябрь</item>
+        <item>Декабрь</item>
+    </string-array>
+
+
 </resources>

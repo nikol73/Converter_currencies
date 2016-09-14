@@ -16,15 +16,13 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-/**
- * Created by PC_BOOK on 03.09.2016.
- */
 
-public class ConverterLoader extends AsyncTaskLoader<String> {
+public class ConverterLoader extends AsyncTaskLoader<ArrayList> {
 
     public static final String arg = "arg";
     private String mWord;
@@ -37,108 +35,108 @@ public class ConverterLoader extends AsyncTaskLoader<String> {
     }
 
     @Override
-    public String loadInBackground() {
+    public ArrayList loadInBackground() {
 
         String data = mWord;
         String date[] = data.split(" ");
+        ArrayList result = new ArrayList();
 
         if (date[0].equals("convert")) {
             data = postHttp(date[1], "convert", "USDEUR");
 
             if (data != "") {
                 String xml = xmlSplit(data);
-                data = searchDataXml(xml, "convert");
+                result = searchDataXml(xml, "convert");
             } else {
-                data = "not downloaded xml";
+                result.add("not downloaded xml");
             }
         } else if (date[0].equals("table")) {
 
             //"месяц год"
             String year = date[1];
-            String eurMonth = "", usdMonth = "";
 
             for (int i = 0; i < 12; i++) {
                 String eur = postHttp("" + (i + 1) + " " + year, "table", "EUR");
                 String usd = postHttp("" + (i + 1) + " " + year, "table", "USD");
+                ArrayList eurArr = new ArrayList();
+                ArrayList usdArr = new ArrayList();
 
                 eur = xmlSplit(eur);
-                eur = searchDataXml(eur, "table");
+                eurArr = searchDataXml(eur, "table");
 
                 usd = xmlSplit(usd);
-                usd = searchDataXml(usd, "table");
+                usdArr = searchDataXml(usd, "table");
 
-                String monthEUR[] = eur.split(" ");
-                String monthUSD[] = usd.split(" ");
 
                 double countValueEUR = 0, countValueUSD = 0;
 
-                for (int j = 0; j < monthEUR.length; j++) {
-                    if (!monthEUR[j].equals("")) {
-                        countValueEUR += Double.parseDouble(inspectionDotDouble(monthEUR[j]));
+                for (int j = 0; j < eurArr.size(); j++) {
+                    if (!eurArr.get(j).toString().equals("")) {
+                        countValueEUR += Double.parseDouble(inspectionDotDouble(eurArr.get(j).toString()));
+                    }
+                }
+                for (int j = 0; j < usdArr.size(); j++) {
+                    if (!usdArr.get(j).toString().equals("")) {
+                        countValueUSD += Double.parseDouble(inspectionDotDouble(usdArr.get(j).toString()));
                     }
                 }
 
-                for (int j = 0; j < monthUSD.length; j++) {
-                    if (!monthUSD[j].equals("")) {
-                        countValueUSD += Double.parseDouble(inspectionDotDouble(monthUSD[j]));
-                    }
-                }
-
-                eurMonth += "" + (countValueEUR / monthEUR.length) + " ";
-                usdMonth += "" + (countValueUSD / monthUSD.length) + " ";
+                result.add("" + (countValueEUR / eurArr.size()));
+                result.add("" + (countValueUSD / usdArr.size()));
             }
 
-            data = eurMonth + ";" + usdMonth;
-
         } else {
-            data = "";
+            result = null;
         }
 
-        return data;
+        return result;
     }
 
     @Override
-    public void deliverResult(String result) {
+    public void deliverResult(ArrayList result) {
         super.deliverResult(result);
     }
 
 
     public String inspectionDotDouble(String value) {
 
-        String v = "";
+        StringBuilder v = new StringBuilder();
 
         for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) == ',') {
-                v += ".";
+                v.append(".");
             } else {
-                v += value.charAt(i);
+                v.append("" + value.charAt(i));
             }
         }
-        return v;
+        return v.toString();
     }
 
     private String xmlSplit(String xml) {
-        String resultXml = "";
+
+        StringBuilder resultXml = new StringBuilder();
+
         boolean flag = false;
         for (int i = 0; i < xml.length(); i++) {
             if (flag == true) {
-                resultXml += xml.charAt(i);
+                resultXml.append("" + xml.charAt(i));
             }
             if (xml.charAt(i) == '>' && flag == false) {
                 flag = true;
             }
         }
 
-        return resultXml;
+        return resultXml.toString();
     }
 
 
-    private String searchDataXml(String xmlRecords, String option) {
-        String result = "";
+    private ArrayList searchDataXml(String xmlRecords, String option) {
+        ArrayList result = new ArrayList();
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             InputSource is = new InputSource();
+            ArrayList l = new ArrayList();
             is.setCharacterStream(new StringReader(xmlRecords));
             Document doc = db.parse(is);
 
@@ -151,7 +149,7 @@ public class ConverterLoader extends AsyncTaskLoader<String> {
                 String error = getCharacterDataFromElement(elementError).toString();
 
                 if (error.equals("Error in parameters")) {
-                    result = error;
+                    result.add(error);
                 }
 
                 for (int i = 0; i < nodes.getLength(); i++) {
@@ -167,7 +165,8 @@ public class ConverterLoader extends AsyncTaskLoader<String> {
                         line = (Element) title.item(0);
                         String value = getCharacterDataFromElement(line).toString();
 
-                        result += charCode + " " + value + " ";
+                        result.add(charCode);
+                        result.add(value);
                     }
                 }
 
@@ -181,7 +180,7 @@ public class ConverterLoader extends AsyncTaskLoader<String> {
                     Element line = (Element) name.item(0);
                     String value = getCharacterDataFromElement(line).toString();
 
-                    result += value + " ";
+                    result.add(value);
                 }
 
             }
@@ -189,6 +188,7 @@ public class ConverterLoader extends AsyncTaskLoader<String> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return result;
     }
 
@@ -203,7 +203,7 @@ public class ConverterLoader extends AsyncTaskLoader<String> {
 
     private String postHttp(final String urlToRead, String option, String v) {
         String resultHttp = "";
-        String result = "";
+        StringBuilder result = new StringBuilder();
         URL url;
         HttpURLConnection conn;
         BufferedReader rd;
@@ -250,9 +250,9 @@ public class ConverterLoader extends AsyncTaskLoader<String> {
             conn.setRequestMethod("POST");
             rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             while ((line = rd.readLine()) != null) {
-                result += line;
+                result.append(line);
             }
-            resultHttp = result;
+            resultHttp = result.toString();
             rd.close();
         } catch (Exception e) {
             e.printStackTrace();

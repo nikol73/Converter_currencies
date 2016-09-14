@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentRight="true"
+        android:id="@+id/scrollElements">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,74 +34,46 @@
                 android:textSize="15dp"
                 android:textStyle="bold" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:orientation="horizontal">
 
-                <FrameLayout
-                    android:layout_width="1dp"
-                    android:layout_height="fill_parent"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="0"
-                    android:background="#0132c8"></FrameLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:text="Дата :"
-                    android:textColor="#f69526"
-                    android:textSize="20dp"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal">
 
+                    <FrameLayout
+                        android:layout_width="1dp"
+                        android:layout_height="fill_parent"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="0"
+                        android:background="#0132c8"></FrameLayout>
 
-                <Spinner
-                    android:id="@+id/optionMonth"
-                    android:layout_width="80dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.2"
-                    android:backgroundTint="#f69526"
-                    android:clickable="false"
-                    android:focusableInTouchMode="true"
-                    android:foreground="#200132c8"
-                    android:nestedScrollingEnabled="false"
-                    android:touchscreenBlocksFocus="false"
-                    android:transitionGroup="false" />
+                    <TextView
+                        android:layout_width="67dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="0.1"
+                        android:text="Дата :"
+                        android:textColor="#f69526"
+                        android:textSize="20dp"
+                        android:textStyle="bold" />
 
-                <Spinner
-                    android:id="@+id/optionNumber"
-                    android:layout_width="80dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.1"
-                    android:backgroundTint="#f69526"
-                    android:clickable="false"
-                    android:foreground="#130132c8" />
+                    <DatePicker
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:id="@+id/datePicker"
+                        android:layout_weight="1" />
 
-                <Spinner
-                    android:id="@+id/optionYear"
-                    android:layout_width="80dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.1"
-                    android:backgroundTint="#f69526"
-                    android:foreground="#200132c8" />
+                    <FrameLayout
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_weight="0"
+                        android:background="#0132c8"></FrameLayout>
 
-
-                <FrameLayout
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="2dp"
-                    android:layout_weight="0"
-                    android:background="#0132c8"></FrameLayout>
-
-            </LinearLayout>
+                </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

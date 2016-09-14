@@ -6,9 +6,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -16,139 +15,59 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTitle("Конвертер валют");
+        setTitle(getString(R.string.NameTitle_ActivityMain));
         eventElement();
         eventButtons();
     }
 
-    Spinner spinnerMonth, spinnerNumber, spinnerYear;
-    Spinner spinnerCurrency1, spinnerCurrency2;
-    TextView nameCurrency, nameDate, nameValue, valueV;
-    Button buttonConverter, buttonTable;
+    private Spinner spinnerCurrency1, spinnerCurrency2;
+    private TextView nameCurrency, nameDate, nameValue, valueV;
+    private Button buttonConverter, buttonTable;
+    private DatePicker dataPicker;
+    private Loader<ArrayList> mLoader;
 
-    int fromYear = 2001, beforeYear = 2016;
-
-    private Loader<String> mLoader;
-
-
-    public void numberSpinner() {
-        Spinner spinner = (Spinner) findViewById(R.id.optionMonth);
-        int value = spinner.getSelectedItemPosition();
-
-        if (value == 1 || value == 3 || value == 5 || value == 7 || value == 8 || value == 10 || value == 12) {
-            value = 31;
-        } else if (value == 4 || value == 6 || value == 9 || value == 11) {
-            value = 30;
-        } else if (value == 2) {
-            value = 29;
-        } else if (value == 0) {
-            value = 31;
-        }
-
-        ArrayList<String> list = new ArrayList<>();
-
-        for (int i = 0; i < value; i++) {
-            if (i == 0) {
-                list.add("Число");
-            }
-            list.add("" + (i + 1));
-        }
-
-        addlistSpiner(list, R.id.optionNumber);
-    }
-
-    public void monthSpinner() {
-        String month[] = {"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-                "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
-        ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < month.length; i++) {
-            if (i == 0) {
-                list.add("Месяц");
-            }
-            list.add((i + 1) + ". " + month[i]);
-        }
-        addlistSpiner(list, R.id.optionMonth);
-    }
-
-    public void yearSpinner() {
-        int year = beforeYear - fromYear;
-
-
-        ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < year; i++) {
-            if (i == 0) {
-                list.add("Год");
-            }
-            list.add("" + (fromYear + (i + 1)));
-        }
-        addlistSpiner(list, R.id.optionYear);
-    }
-
-    public void addlistSpiner(ArrayList<String> list, int id) {
-        final Spinner spinner = (Spinner) findViewById(id);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-    }
 
     public void eventElement() {
-        monthSpinner();
-        yearSpinner();
+
+        dataPicker = (DatePicker) findViewById(R.id.datePicker);
 
         nameCurrency = (TextView) findViewById(R.id.textViewIzV);
         nameDate = (TextView) findViewById(R.id.textViewDate);
         nameValue = (TextView) findViewById(R.id.textViewValue);
         valueV = (EditText) findViewById(R.id.editTextValue);
 
-        spinnerMonth = (Spinner) findViewById(R.id.optionMonth);
-        spinnerNumber = (Spinner) findViewById(R.id.optionNumber);
-        spinnerYear = (Spinner) findViewById(R.id.optionYear);
         spinnerCurrency1 = (Spinner) findViewById(R.id.optionCurrency1);
         spinnerCurrency2 = (Spinner) findViewById(R.id.optionCurrency2);
 
-        spinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                numberSpinner();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
+        dataPicker.setCalendarViewShown(false);
+        dataPicker.setSpinnersShown(true);
     }
 
 
     public String checkDataSpinner() {
 
-        final int valueNumber = spinnerNumber.getSelectedItemPosition(),
-                valueMonth = spinnerMonth.getSelectedItemPosition(),
-                valueYear = spinnerYear.getSelectedItemPosition(),
-
-                valueCurrency1 = spinnerCurrency1.getSelectedItemPosition(),
+        final int valueCurrency1 = spinnerCurrency1.getSelectedItemPosition(),
                 valueCurrency2 = spinnerCurrency2.getSelectedItemPosition();
 
         EditText value = (EditText) findViewById(R.id.editTextValue);
         String valuestring = value.getText().toString();
         String result;
 
-        if (valueNumber != 0 && valueMonth != 0 && valueYear != 0
-                && valueCurrency1 != 0 && valueCurrency2 != 0 && !valuestring.equals("")) {
-
-            String number = valueNumber < 10 ? "0" + valueNumber : "" + valueNumber,
-                    month = valueMonth < 10 ? "0" + valueMonth : "" + valueMonth,
-                    year = "" + (valueYear + fromYear),
+        if (valueCurrency1 != 0 && valueCurrency2 != 0 && !valuestring.equals("")) {
+            String day = dataPicker.getDayOfMonth() < 10 ? "0" + dataPicker.getDayOfMonth() : "" + dataPicker.getDayOfMonth(),
+                    month = dataPicker.getMonth() < 10 ? "0" + dataPicker.getMonth() : "" + dataPicker.getMonth(),
+                    year = "" + dataPicker.getYear(),
 
                     currency1 = valueCurrency1 == 1 ? "Dollar" : "Euro",
                     currency2 = valueCurrency2 == 1 ? "Dollar" : "Euro";
 
-            String date = number + "/" + month + "/" + year;
+            String date = day + "/" + month + "/" + year;
             result = date + " " + currency1 + " " + currency2;
         } else {
             result = null;
@@ -166,15 +85,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onClick(View v) {
 
                 String data = checkDataSpinner();
-
-                buttonConverter.setText("ЗАГРУЗКА...");
+                buttonConverter.setText(getString(R.string.textButtonConvert_loading));
 
                 if (data != null) {
                     resetLoader("convert " + data);
                     mLoader.onContentChanged();
                 } else {
-                    Message("Не все поля заполненны!");
-                    buttonConverter.setText("КОНВЕРТИРОВАТЬ");
+                    Message(getString(R.string.Message_fields));
+                    buttonConverter.setText(getString(R.string.textButtonConvert_noLoading));
                 }
             }
         });
@@ -193,12 +111,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
-    public void converter(String valute) {
+    public void converter(ArrayList valute) {
 
         String data[] = checkDataSpinner().split(" ");
         String currency1 = data[1];
         String currency2 = data[2];
-        String valuteData[] = valute.split(" ");
+        ArrayList valuteData = valute;
 
         //"Dollar" "Euro"
 
@@ -206,16 +124,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         double dollar = 0, euro = 0;
 
-        for (int i = 0; i < valuteData.length; i++) {
-            if (valuteData[i].equals("USD")) {
-                dollar = Double.parseDouble(inspectionDotDouble(valuteData[i + 1]));
-            } else if (valuteData[i].equals("EUR")) {
-                euro = Double.parseDouble(inspectionDotDouble(valuteData[i + 1]));
+        for (int i = 0; i < valuteData.size(); i++) {
+            if (valuteData.get(i).equals("USD")) {
+                dollar = Double.parseDouble(inspectionDotDouble(valuteData.get(i + 1).toString()));
+            } else if (valuteData.get(i).equals("EUR")) {
+                euro = Double.parseDouble(inspectionDotDouble(valuteData.get(i + 1).toString()));
             }
         }
 
         if (currency1.equals("Dollar") && currency2.equals("Euro")) {
-            nameCurrency.setText("Доллар -> Евро");
+            nameCurrency.setText(getString(R.string.textTextView_nameCurrency_DE));
             nameDate.setText("На " + data[0]);
 
             number = (number * dollar) / euro;
@@ -223,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             nameValue.setText("" + String.format("%.4f", number));
 
         } else if (currency1.equals("Euro") && currency2.equals("Dollar")) {
-            nameCurrency.setText("Евро -> Доллар");
+            nameCurrency.setText(getString(R.string.textTextView_nameCurrency_ED));
             nameDate.setText("На " + data[0]);
 
             number = (number * euro) / dollar;
@@ -232,22 +150,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         } else if (currency1.equals("Dollar") && currency2.equals("Dollar") ||
                 currency1.equals("Euro") && currency2.equals("Euro")) {
-            Message("Указанные валюты одинаковые!");
+            Message(getString(R.string.Message_DollarEuro));
         }
     }
 
     public String inspectionDotDouble(String value) {
 
-        String v = "";
+        StringBuilder v = new StringBuilder();
 
         for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) == ',') {
-                v += ".";
+                v.append(".");
             } else {
-                v += value.charAt(i);
+                v.append("" + value.charAt(i));
             }
         }
-        return v;
+        return v.toString();
     }
 
     public void Message(String message) {
@@ -256,22 +174,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
     @Override
-    public Loader<String> onCreateLoader(int id, Bundle args) {
-        Loader<String> mLoader = null;
+    public Loader<ArrayList> onCreateLoader(int id, Bundle args) {
+        Loader<ArrayList> mLoader = null;
         mLoader = new ConverterLoader(this, args);
         return mLoader;
     }
 
     @Override
-    public void onLoadFinished(Loader<String> loader, String data) {
-        if (data.equals("not downloaded xml")) {
-            Message("Не удалось скачать данные");
-        } else if (data.equals("Error in parameters")) {
-            Message("Данные за текущий день отсутствуют");
-        } else if (!data.equals("")) {
+    public void onLoadFinished(Loader<ArrayList> loader, ArrayList data) {
+
+        if (data.get(0).equals("not downloaded xml") && data.size() == 1) {
+            Message(getString(R.string.Message_NotDownloadedXml));
+        } else if (data.get(0).equals("Error in parameters") && data.size() == 1) {
+            Message(getString(R.string.Message_ErrorInParameters));
+        } else if (!data.get(0).equals("") && data.size() >= 1) {
             converter(data);
         }
-        buttonConverter.setText("КОНВЕРТИРОВАТЬ");
+
+        buttonConverter.setText(getString(R.string.textButtonConvert_noLoading));
     }
 
     public void resetLoader(String DATA) {
@@ -281,6 +201,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoaderReset(Loader<String> loader) {
+    public void onLoaderReset(Loader<ArrayList> loader) {
     }
 }
